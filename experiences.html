@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiences - Magic Mountain Resort Ke</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .exp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: auto; }
+        .exp-card { border-radius: 10px; overflow: hidden; position: relative; }
+        .exp-card img { width: 100%; height: 350px; object-fit: cover; transition: transform 0.3s; }
+        .exp-card:hover img { transform: scale(1.05); }
+        .exp-overlay { position: absolute; bottom: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); width: 100%; padding: 2rem; color: white; }
+    </style>
+</head>
+<body>
+
+    <header id="main-header" class="scrolled">
+        <div class="logo">Magic Mountain</div>
+        <nav><ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="experiences.html" style="color: var(--accent-gold);">Activities</a></li>
+        </ul></nav>
+        <a href="booking.html" class="btn-primary">Book Your Stay</a>
+    </header>
+
+    <section style="padding-top: 8rem;">
+        <h1 class="section-title">Resort Experiences</h1>
+        <p style="text-align: center; margin-bottom: 3rem;">Reconnect with nature through our curated luxury activities.</p>
+
+        <div class="exp-grid">
+            <div class="exp-card glass">
+                <img src="https://images.unsplash.com/photo-1551632811-561732d1e306" alt="Hiking">
+                <div class="exp-overlay"><h3>Mountain Hiking</h3><p>Guided tours through scenic trails.</p></div>
+            </div>
+            <div class="exp-card glass">
+                <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874" alt="Spa">
+                <div class="exp-overlay"><h3>Spa & Wellness</h3><p>Rejuvenating treatments in the forest.</p></div>
+            </div>
+            <div class="exp-card glass">
+                <img src="https://images.unsplash.com/photo-1517400508447-f8dd518b86db" alt="Bonfire">
+                <div class="exp-overlay"><h3>Bonfire Nights</h3><p>Cozy evenings under the starry sky.</p></div>
+            </div>
+            <div class="exp-card glass">
+                <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4" alt="Pool">
+                <div class="exp-overlay"><h3>Infinity Pool</h3><p>Swim while overlooking the valley.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="logo"><i class="fa-solid fa-mountain-sun"></i> Magic Mountain</div>
+        <p>&copy; 2026 Magic Mountain Resort Ke. All rights reserved.</p>
+        <a href="admin.html" class="admin-link">Admin Portal</a>
+    </footer>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html"><i class="fa-solid fa-home"></i> Home</a>
+        <a href="rooms.html"><i class="fa-solid fa-bed"></i> Rooms</a>
+        <a href="booking.html"><i class="fa-solid fa-calendar-check"></i> Book</a>
+        <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="contact.html"><i class="fa-solid fa-phone"></i> Contact</a>
+    </nav>
+</body>
+</html>
+

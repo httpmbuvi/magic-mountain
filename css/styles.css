@@ -1,0 +1,417 @@
+:root {
+    /* Luxury Nature Palette - Enhanced for Visibility */
+    --primary-green: #1C3B2B; /* Deeper forest green for higher contrast */
+    --accent-gold: #D4AF37; /* More vibrant true gold */
+    --sunset-orange: #E86A33; /* Deeper sunset for accents */
+    --sky-blue: #5C9596; /* Darker cool sky for readability */
+    --bg-light: #F3F4F6; /* Slightly cooler light grey to make white cards pop */
+    --bg-white: #FFFFFF;
+    --text-dark: #111827; /* Near black for sharpest text contrast */
+    --text-light: #F9FAFB; /* Off-white for less eye strain on dark backgrounds */
+    
+    /* Glassmorphism - Light Mode */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+
+    /* Dark Mode Variables */
+    --bg-dark-primary: #0F172A; /* Deep slate instead of pure black for a more luxurious feel */
+    --bg-dark-secondary: #1E293B;
+    --text-dark-mode: #F3F4F6; /* High contrast white text */
+}
+
+body.dark-mode {
+    --bg-light: var(--bg-dark-primary);
+    --bg-white: var(--bg-dark-secondary);
+    --text-dark: var(--text-dark-mode);
+    --primary-green: #4A8B71; /* Brighter forest green for dark mode visibility */
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+.glass-dark {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Navigation */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1.5rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.4s ease;
+}
+
+header.scrolled {
+    background: var(--bg-white);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 5%;
+}
+
+header.scrolled .nav-links a, header.scrolled .logo {
+    color: var(--primary-green);
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 400;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--accent-gold);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--accent-gold);
+    color: var(--primary-green); /* Dark green on gold for sharp contrast */
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    background-color: #b5954a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(203, 170, 92, 0.4);
+    color: var(--primary-green);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--accent-gold);
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    font-weight: 700;
+    border: 2px solid var(--accent-gold);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    background-color: var(--accent-gold);
+    color: var(--primary-green); /* Dark green for sharp contrast on gold */
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    background-color: var(--bg-dark-primary); /* Dark fallback background before video loads */
+    z-index: 1; /* Creates stacking context so video stays visible on top of background */
+}
+
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+    z-index: -1;
+}
+
+.hero-content {
+    max-width: 800px;
+    padding: 0 20px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease forwards 0.5s;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sections Base */
+section {
+    padding: 6rem 5%;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: var(--primary-green);
+    margin-bottom: 3rem;
+}
+
+.dark-mode .section-title {
+    color: var(--accent-gold);
+}
+
+/* Floating WhatsApp */
+.whatsapp-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #25d366;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+}
+
+/* Footer */
+footer {
+    background-color: var(--primary-green);
+    color: var(--text-light);
+    padding: 3rem 5%;
+    text-align: center;
+    margin-top: 4rem;
+}
+
+footer .logo {
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+footer a.admin-link {
+    color: var(--accent-gold);
+    font-size: 0.9rem;
+    text-decoration: underline;
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+/* Dark Mode Toggle */
+.theme-toggle {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 1rem;
+}
+
+/* Bottom Navigation Bar (Mobile) */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--bg-white);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    padding: 0.5rem 0;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid var(--glass-border);
+}
+
+.bottom-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.7rem;
+    color: var(--primary-green);
+    gap: 4px;
+}
+
+.bottom-nav a i {
+    font-size: 1.2rem;
+}
+
+.bottom-nav a.active {
+    color: var(--accent-gold);
+}
+
+/* Swiper Mobile Tweaks */
+.swiper-pagination-bullet {
+    background: var(--accent-gold);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; /* Hidden on mobile */
+    }
+    
+    .bottom-nav {
+        display: flex;
+    }
+
+    body {
+        padding-bottom: 70px; /* Space for bottom nav */
+    }
+
+    .whatsapp-float {
+        bottom: 80px; /* Shift up above bottom nav */
+    }
+
+    header {
+        padding: 1rem 5%;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero p {
+        font-size: 1.1rem;
+    }
+    
+    section {
+        padding: 4rem 5%;
+    }
+    
+    .tab-content {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        min-width: 600px; /* Force scroll on small screens instead of squishing */
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    /* Native CSS Swipe Carousels for Mobile */
+    .mobile-swipe {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 1.5rem;
+        padding-bottom: 2rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+    
+    .mobile-swipe::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+    
+    .mobile-swipe > * {
+        scroll-snap-align: center;
+        flex: 0 0 85% !important;
+    }
+}

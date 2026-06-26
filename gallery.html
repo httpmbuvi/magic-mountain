@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Magic Mountain Resort Ke</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; max-width: 1200px; margin: auto; }
+        .gallery-item { border-radius: 8px; overflow: hidden; cursor: pointer; }
+        .gallery-item img, .gallery-item video { width: 100%; height: 250px; object-fit: cover; transition: transform 0.3s; }
+        .gallery-item:hover img, .gallery-item:hover video { transform: scale(1.1); }
+        @media (max-width: 768px) {
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+            .gallery-item img, .gallery-item video { height: 150px; }
+            .gallery-item h4 { font-size: 0.9rem; }
+            .gallery-item p { display: none; /* Hide descriptions on small mobile grid to save space */ }
+            .gallery-item div { padding: 0.5rem !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header" class="scrolled">
+        <div class="logo">Magic Mountain</div>
+        <nav><ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="gallery.html" style="color: var(--accent-gold);">Gallery</a></li>
+        </ul></nav>
+    </header>
+
+    <section style="padding-top: 8rem;">
+        <h1 class="section-title">Our Gallery</h1>
+        <div class="gallery-grid" id="gallery-container"></div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script>
+        localforage.getItem('mockDB').then(db => {
+            if (db && db.content) {
+                const text = db.content['logo_text'] || 'Magic Mountain';
+                const img = db.content['logo_image'];
+                if (db.content['logo_text'] || db.content['logo_image']) {
+                    const html = img ? `<img src="${img}" style="height: 40px; margin-right: 10px; vertical-align: middle;"> ${text}` 
+                                     : `<i class="fa-solid fa-mountain-sun"></i> ${text}`;
+                    document.querySelectorAll('.logo').forEach(el => el.innerHTML = html);
+                }
+            }
+        });
+        const fallbackGallery = [
+            { category: 'Nature', image_url: 'https://images.unsplash.com/photo-1540541338287-41700207dee6' },
+            { category: 'Pool', image_url: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4' },
+            { category: 'Dining', image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4' },
+            { category: 'Rooms', image_url: 'https://images.unsplash.com/photo-1590490360182-c33d57733427' },
+            { category: 'Events', image_url: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed' },
+            { category: 'Nature', image_url: 'https://images.unsplash.com/photo-1551632811-561732d1e306' }
+        ];
+
+        async function loadGallery() {
+            const container = document.getElementById('gallery-container');
+            let images = fallbackGallery;
+            try {
+                const res = await fetch('/api/gallery');
+                const data = await res.json();
+                if(data && data.length > 0) images = data;
+            } catch (err) {
+                const db = await localforage.getItem('mockDB');
+                if(db && db.gallery && db.gallery.length > 0) images = db.gallery;
+            }
+
+            container.innerHTML = images.map(img => {
+                const isVideo = img.image_url.startsWith('data:video') || img.image_url.endsWith('.mp4');
+                const mediaTag = isVideo 
+                    ? `<video src="${img.image_url}" autoplay loop muted playsinline></video>`
+                    : `<img src="${img.image_url}" alt="${img.category}">`;
+                return `
+                <div class="gallery-item glass" style="position: relative;">
+                    ${mediaTag}
+                    <div style="padding: 1rem;">
+                        <h4 style="color: var(--primary-green); margin-bottom: 0.5rem;">${img.category}</h4>
+                        ${img.description ? `<p style="font-size: 0.9rem;">${img.description}</p>` : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        loadGallery();
+    </script>
+    <footer>
+        <div class="logo"><i class="fa-solid fa-mountain-sun"></i> Magic Mountain</div>
+        <p>&copy; 2026 Magic Mountain Resort Ke. All rights reserved.</p>
+        <a href="admin.html" class="admin-link">Admin Portal</a>
+    </footer>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html"><i class="fa-solid fa-home"></i> Home</a>
+        <a href="rooms.html"><i class="fa-solid fa-bed"></i> Rooms</a>
+        <a href="booking.html"><i class="fa-solid fa-calendar-check"></i> Book</a>
+        <a href="gallery.html" class="active"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="contact.html"><i class="fa-solid fa-phone"></i> Contact</a>
+    </nav>
+</body>
+</html>
+

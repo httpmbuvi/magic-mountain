@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weddings & Events - Magic Mountain Resort Ke</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header id="main-header" class="scrolled">
+        <div class="logo">Magic Mountain</div>
+        <nav><ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html" style="color: var(--accent-gold);">Weddings & Events</a></li>
+        </ul></nav>
+        <a href="booking.html" class="btn-primary">Book Your Stay</a>
+    </header>
+
+    <section style="padding-top: 8rem;">
+        <h1 class="section-title">Unforgettable Events</h1>
+        <p style="text-align: center; max-width: 600px; margin: 0 auto 3rem;">From dream weddings to productive corporate retreats, we provide the perfect venue.</p>
+
+        <div id="events-container" style="display: grid; grid-template-columns: 1fr; gap: 3rem; max-width: 900px; margin: auto;">
+            <!-- Content loaded via API or fallback -->
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script>
+        localforage.getItem('mockDB').then(db => {
+            if (db && db.content) {
+                const text = db.content['logo_text'] || 'Magic Mountain';
+                const img = db.content['logo_image'];
+                if (db.content['logo_text'] || db.content['logo_image']) {
+                    const html = img ? `<img src="${img}" style="height: 40px; margin-right: 10px; vertical-align: middle;"> ${text}` 
+                                     : `<i class="fa-solid fa-mountain-sun"></i> ${text}`;
+                    document.querySelectorAll('.logo').forEach(el => el.innerHTML = html);
+                }
+            }
+        });
+        const fallbackEvents = [
+            { title: 'Destination Weddings', type: 'Wedding', description: 'Say "I Do" with a stunning mountain backdrop. Our wedding planners handle everything from decor to catering.', image_url: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed' },
+            { title: 'Corporate Retreats', type: 'Corporate', description: 'Modern conference facilities with high-speed Wi-Fi, team-building activities, and premium catering.', image_url: 'https://images.unsplash.com/photo-1511578314322-379afb476865' }
+        ];
+
+        async function loadEvents() {
+            const container = document.getElementById('events-container');
+            let events = fallbackEvents;
+            try {
+                const res = await fetch('/api/events');
+                const data = await res.json();
+                if(data && data.length > 0) events = data;
+            } catch (err) {
+                const db = await localforage.getItem('mockDB');
+                if(db && db.events && db.events.length > 0) events = db.events;
+            }
+
+            container.innerHTML = events.map(e => `
+                <div class="glass" style="display: flex; flex-wrap: wrap; border-radius: 10px; overflow: hidden;">
+                    <img src="${e.image_url}" style="width: 100%; max-width: 400px; object-fit: cover;" alt="${e.title}">
+                    <div style="padding: 2rem; flex: 1; min-width: 300px;">
+                        <h3 style="color: var(--primary-green); font-size: 1.8rem; margin-bottom: 0.5rem;">${e.title}</h3>
+                        <p style="color: var(--accent-gold); font-weight: bold; margin-bottom: 1rem;">${e.type}</p>
+                        <p style="margin-bottom: 1.5rem; line-height: 1.6;">${e.description || 'Host your perfect event with us.'}</p>
+                        <a href="contact.html" class="btn-primary">Inquire Now</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+        loadEvents();
+    </script>
+    <footer>
+        <div class="logo"><i class="fa-solid fa-mountain-sun"></i> Magic Mountain</div>
+        <p>&copy; 2026 Magic Mountain Resort Ke. All rights reserved.</p>
+        <a href="admin.html" class="admin-link">Admin Portal</a>
+    </footer>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html"><i class="fa-solid fa-home"></i> Home</a>
+        <a href="rooms.html"><i class="fa-solid fa-bed"></i> Rooms</a>
+        <a href="booking.html"><i class="fa-solid fa-calendar-check"></i> Book</a>
+        <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="contact.html"><i class="fa-solid fa-phone"></i> Contact</a>
+    </nav>
+</body>
+</html>
+

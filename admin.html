@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Magic Mountain Resort Ke</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 6rem auto;
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .hidden { display: none; }
+        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #eee; padding-bottom: 1rem; overflow-x: auto; }
+        .tab-btn { background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--primary-green); font-weight: bold; padding: 0.5rem 1rem; white-space: nowrap; }
+        .tab-btn.active { background-color: var(--accent-gold); color: white; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+        th, td { border: 1px solid #ddd; padding: 1rem; text-align: left; }
+        th { background-color: var(--primary-green); color: white; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <header class="scrolled">
+        <div class="logo">Admin Portal</div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="index.html" class="btn-secondary" style="border-color: white; color: white; text-decoration: none;">Exit to Site</a>
+            <button id="logout-btn" class="btn-secondary hidden" style="border-color: white; color: white;">Logout</button>
+        </div>
+    </header>
+
+    <div class="admin-container" id="login-view">
+        <h2 style="text-align: center; color: var(--primary-green); margin-bottom: 2rem;">Admin Login</h2>
+        <form id="login-form" style="max-width: 400px; margin: 0 auto;">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Login</button>
+            <p id="login-error" style="color: red; text-align: center; margin-top: 1rem;"></p>
+        </form>
+    </div>
+
+    <div class="admin-container hidden" id="dashboard-view">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('bookings')">Bookings</button>
+            <button class="tab-btn" onclick="showTab('rooms')">Rooms</button>
+            <button class="tab-btn" onclick="showTab('blog')">Blog</button>
+            <button class="tab-btn" onclick="showTab('events')">Events</button>
+            <button class="tab-btn" onclick="showTab('testimonials')">Testimonials</button>
+            <button class="tab-btn" onclick="showTab('gallery')">Gallery</button>
+            <button class="tab-btn" onclick="showTab('content')">Content</button>
+        </div>
+
+        <!-- Bookings Tab -->
+        <div id="bookings-tab" class="tab-content">
+            <h3>Recent Bookings</h3>
+            <table>
+                <thead><tr><th>ID</th><th>Guest</th><th>Room</th><th>Dates</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="bookings-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Rooms Tab -->
+        <div id="rooms-tab" class="tab-content hidden">
+            <h3>Add Room</h3>
+            <form id="add-room-form" style="margin-bottom: 2rem;">
+                <div class="form-group"><label>Name</label><input type="text" id="r_name" required></div>
+                <div class="form-group"><label>Price</label><input type="number" id="r_price" required></div>
+                <div class="form-group"><label>Upload Media (Image/Video)</label><input type="file" id="r_image_file" accept="image/*,video/*"></div>
+                <button type="submit" class="btn-primary">Add Room</button>
+            </form>
+            <h3>Manage Rooms</h3>
+            <table>
+                <thead><tr><th>Name</th><th>Price</th><th>Action</th></tr></thead>
+                <tbody id="rooms-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Blog Tab -->
+        <div id="blog-tab" class="tab-content hidden">
+            <h3>Add Blog Post</h3>
+            <form id="add-blog-form" style="margin-bottom: 2rem;">
+                <div class="form-group"><label>Title</label><input type="text" id="b_title" required></div>
+                <div class="form-group"><label>Upload Media (Image/Video)</label><input type="file" id="b_image_file" accept="image/*,video/*"></div>
+                <div class="form-group"><label>Content</label><textarea id="b_content" rows="4" required></textarea></div>
+                <button type="submit" class="btn-primary">Add Post</button>
+            </form>
+            <h3>Manage Blog</h3>
+            <table>
+                <thead><tr><th>Title</th><th>Action</th></tr></thead>
+                <tbody id="blog-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Events Tab -->
+        <div id="events-tab" class="tab-content hidden">
+            <h3>Add Event Type</h3>
+            <form id="add-event-form" style="margin-bottom: 2rem;">
+                <div class="form-group"><label>Title</label><input type="text" id="e_title" required></div>
+                <div class="form-group"><label>Type (e.g. Wedding, Corporate)</label><input type="text" id="e_type"></div>
+                <div class="form-group"><label>Upload Media (Image/Video)</label><input type="file" id="e_image_file" accept="image/*,video/*"></div>
+                <button type="submit" class="btn-primary">Add Event</button>
+            </form>
+            <h3>Manage Events</h3>
+            <table>
+                <thead><tr><th>Title</th><th>Type</th><th>Action</th></tr></thead>
+                <tbody id="events-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Testimonials Tab -->
+        <div id="testimonials-tab" class="tab-content hidden">
+            <h3>Manage Testimonials</h3>
+            <table>
+                <thead><tr><th>Guest</th><th>Rating</th><th>Review</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="testimonials-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Gallery Tab -->
+        <div id="gallery-tab" class="tab-content hidden">
+            <h3>Add / Edit Gallery Media</h3>
+            <form id="add-gallery-form" style="margin-bottom: 2rem;">
+                <input type="hidden" id="g_id">
+                <div class="form-group"><label>Category</label><input type="text" id="g_category" required></div>
+                <div class="form-group"><label>Description</label><textarea id="g_description" rows="2"></textarea></div>
+                <div class="form-group"><label>Upload Media (Optional if editing)</label><input type="file" id="g_image_file" accept="image/*,video/*"></div>
+                <button type="submit" id="g_submit_btn" class="btn-primary">Add Media</button>
+                <button type="button" id="g_cancel_btn" class="btn-secondary hidden" onclick="cancelGalleryEdit()">Cancel</button>
+            </form>
+            <h3>Manage Gallery</h3>
+            <table>
+                <thead><tr><th>Category</th><th>Description</th><th>Media Preview</th><th>Action</th></tr></thead>
+                <tbody id="gallery-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Content Tab -->
+        <div id="content-tab" class="tab-content hidden">
+            <h3>Edit General Content</h3>
+            <form id="edit-content-form" style="max-width: 600px;">
+                <div class="form-group"><label>Logo Text</label><input type="text" id="c_logo_text" placeholder="Magic Mountain"></div>
+                <div class="form-group"><label>Upload Custom Logo Image</label><input type="file" id="c_logo_image" accept="image/*"></div>
+                <div class="form-group"><label>Hero Title</label><input type="text" id="c_hero_title"></div>
+                <div class="form-group"><label>Hero Subtitle</label><textarea id="c_hero_subtitle" rows="3"></textarea></div>
+                <div class="form-group"><label>About Us Section Text</label><textarea id="c_about_text" rows="5"></textarea></div>
+                <div class="form-group"><label>Contact Phone</label><input type="text" id="c_phone"></div>
+                <div class="form-group"><label>Contact Email</label><input type="email" id="c_email"></div>
+                <button type="submit" class="btn-primary">Save Content</button>
+                <p id="content-msg" style="color: green; margin-top: 1rem;"></p>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        localforage.getItem('mockDB').then(db => {
+            if (db && db.content) {
+                const text = db.content['logo_text'] || 'Magic Mountain Admin';
+                const img = db.content['logo_image'];
+                if (db.content['logo_text'] || db.content['logo_image']) {
+                    const html = img ? `<img src="${img}" style="height: 40px; margin-right: 10px; vertical-align: middle;"> ${text}` 
+                                     : `<i class="fa-solid fa-mountain-sun"></i> ${text}`;
+                    document.querySelectorAll('.logo').forEach(el => el.innerHTML = html);
+                }
+            }
+        });
+
+        let token = localStorage.getItem('admin_token');
+
+        if (token) {
+            showDashboard();
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    token = data.token;
+                    localStorage.setItem('admin_token', token);
+                    showDashboard();
+                } else {
+                    document.getElementById('login-error').innerText = data.error;
+                }
+            } catch (err) {
+                // Fallback to Mock Login if no server is running
+                if (username === 'admin' && password === 'admin123') {
+                    token = 'mock-token';
+                    localStorage.setItem('admin_token', token);
+                    showDashboard();
+                } else {
+                    document.getElementById('login-error').innerText = 'Invalid credentials (try admin / admin123)';
+                }
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('admin_token');
+            location.reload();
+        });
+
+        function showDashboard() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('logout-btn').classList.remove('hidden');
+            loadData();
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.remove('hidden');
+        }
+
+        async function loadData() {
+            loadBookings();
+            loadRooms();
+            loadBlog();
+            loadEvents();
+            loadTestimonials();
+            loadGallery();
+            loadContent();
+        }
+
+        // Mock Backend Logic for local testing
+        async function mockAPI(endpoint, method = 'GET', body = null) {
+            let db = await localforage.getItem('mockDB');
+            if (!db) db = { rooms: [], bookings: [], blog: [], events: [], testimonials: [], gallery: [], content: {} };
+            const saveDB = async () => await localforage.setItem('mockDB', db);
+
+            if (endpoint.includes('/rooms')) {
+                if (method === 'GET') return db.rooms;
+                if (method === 'POST') { body.id = Date.now(); db.rooms.push(body); await saveDB(); return {}; }
+                if (method === 'DELETE') { db.rooms = db.rooms.filter(x => x.id != endpoint.split('/').pop()); await saveDB(); return {}; }
+            }
+            if (endpoint.includes('/blog')) {
+                if (method === 'GET') return db.blog;
+                if (method === 'POST') { body.id = Date.now(); db.blog.push(body); await saveDB(); return {}; }
+                if (method === 'DELETE') { db.blog = db.blog.filter(x => x.id != endpoint.split('/').pop()); await saveDB(); return {}; }
+            }
+            if (endpoint.includes('/events')) {
+                if (method === 'GET') return db.events;
+                if (method === 'POST') { body.id = Date.now(); db.events.push(body); await saveDB(); return {}; }
+                if (method === 'DELETE') { db.events = db.events.filter(x => x.id != endpoint.split('/').pop()); await saveDB(); return {}; }
+            }
+            if (endpoint.includes('/gallery')) {
+                if (method === 'GET') return db.gallery;
+                if (method === 'POST') { body.id = Date.now(); db.gallery.push(body); await saveDB(); return {}; }
+                if (method === 'PUT') { 
+                    const item = db.gallery.find(x => x.id == endpoint.split('/').pop());
+                    if(item) {
+                        item.category = body.category;
+                        item.description = body.description;
+                        if(body.image_url) item.image_url = body.image_url;
+                        await saveDB();
+                    }
+                    return {};
+                }
+                if (method === 'DELETE') { db.gallery = db.gallery.filter(x => x.id != endpoint.split('/').pop()); await saveDB(); return {}; }
+            }
+            if (endpoint.includes('/bookings')) {
+                if (method === 'GET') return db.bookings;
+                if (method === 'PUT') { const b = db.bookings.find(x => x.id == endpoint.split('/')[4]); if(b) b.status = body.status; await saveDB(); return {}; }
+            }
+            if (endpoint.includes('/testimonials')) return db.testimonials;
+            
+            if (endpoint === '/api/admin/content' && method === 'PUT') {
+                db.content[body.section_key] = body.content_value; await saveDB(); return {};
+            }
+            if (endpoint === '/api/content') return db.content;
+
+            return [];
+        }
+
+        // Generic fetch wrapper
+        async function fetchAPI(endpoint, method = 'GET', body = null) {
+            const options = { method, headers: { 'Authorization': `Bearer ${token}` } };
+            if (body) {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(body);
+            }
+            try {
+                const res = await fetch(endpoint, options);
+                if (res.status === 401) { localStorage.removeItem('admin_token'); location.reload(); }
+                return await res.json();
+            } catch (err) {
+                return await mockAPI(endpoint, method, body);
+            }
+        }
+
+        // Loaders
+        async function loadBookings() {
+            const data = await fetchAPI('/api/admin/bookings');
+            document.getElementById('bookings-tbody').innerHTML = data.map(b => `
+                <tr><td>${b.id}</td><td>${b.guest_name}</td><td>${b.room_name}</td><td>${b.check_in}</td><td>${b.status}</td>
+                <td><button onclick="updateBooking(${b.id}, 'Approved')">Approve</button></td></tr>
+            `).join('');
+        }
+        async function loadRooms() {
+            const data = await fetchAPI('/api/rooms'); // public
+            document.getElementById('rooms-tbody').innerHTML = data.map(r => `
+                <tr><td>${r.name}</td><td>$${r.price}</td><td><button onclick="del('/api/admin/rooms/${r.id}', loadRooms)">Delete</button></td></tr>
+            `).join('');
+        }
+        async function loadBlog() {
+            const data = await fetchAPI('/api/blog'); // public
+            document.getElementById('blog-tbody').innerHTML = data.map(b => `
+                <tr><td>${b.title}</td><td><button onclick="del('/api/admin/blog/${b.id}', loadBlog)">Delete</button></td></tr>
+            `).join('');
+        }
+        async function loadEvents() {
+            const data = await fetchAPI('/api/events'); // public
+            document.getElementById('events-tbody').innerHTML = data.map(e => `
+                <tr><td>${e.title}</td><td>${e.type}</td><td><button onclick="del('/api/admin/events/${e.id}', loadEvents)">Delete</button></td></tr>
+            `).join('');
+        }
+        async function loadTestimonials() {
+            const data = await fetchAPI('/api/admin/testimonials/all');
+            document.getElementById('testimonials-tbody').innerHTML = data.map(t => `
+                <tr><td>${t.guest_name}</td><td>${t.rating}/5</td><td>${t.review_text}</td><td>${t.is_approved ? 'Approved' : 'Pending'}</td>
+                <td><button onclick="approveTestimonial(${t.id}, ${!t.is_approved})">Toggle Approval</button></td></tr>
+            `).join('');
+        }
+        async function loadGallery() {
+            const data = await fetchAPI('/api/gallery'); // public
+            document.getElementById('gallery-tbody').innerHTML = data.map(g => {
+                const mediaTag = (g.image_url.startsWith('data:video') || g.image_url.endsWith('.mp4')) 
+                    ? `<video src="${g.image_url}" style="width: 80px; height: 60px; object-fit: cover;"></video>`
+                    : `<img src="${g.image_url}" style="width: 80px; height: 60px; object-fit: cover;">`;
+                const safeCat = (g.category || '').replace(/'/g, "\\'");
+                const safeDesc = (g.description || '').replace(/'/g, "\\'");
+                return `
+                <tr>
+                    <td>${g.category}</td>
+                    <td>${g.description || ''}</td>
+                    <td>${mediaTag}</td>
+                    <td>
+                        <button onclick="editGallery(${g.id}, '${safeCat}', '${safeDesc}')">Edit</button>
+                        <button style="background:red;color:white;border:none;padding:5px 10px;" onclick="del('/api/admin/gallery/${g.id}', loadGallery)">Delete</button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+        async function loadContent() {
+            const db = await localforage.getItem('mockDB');
+            const data = db && db.content ? db.content : await fetch('/api/content').then(r => r.json()).catch(() => ({}));
+            
+            if (data['logo_text']) document.getElementById('c_logo_text').value = data['logo_text'];
+            if (data['hero_title']) document.getElementById('c_hero_title').value = data['hero_title'];
+            if (data['hero_subtitle']) document.getElementById('c_hero_subtitle').value = data['hero_subtitle'];
+            if (data['about_text']) document.getElementById('c_about_text').value = data['about_text'];
+            if (data['phone']) document.getElementById('c_phone').value = data['phone'];
+            if (data['email']) document.getElementById('c_email').value = data['email'];
+        }
+
+        // Actions
+        async function del(endpoint, reloadFn) {
+            if(confirm('Are you sure?')) { await fetchAPI(endpoint, 'DELETE'); reloadFn(); }
+        }
+        async function updateBooking(id, status) {
+            await fetchAPI(`/api/admin/bookings/${id}/status`, 'PUT', { status });
+            loadBookings();
+        }
+        async function approveTestimonial(id, is_approved) {
+            await fetchAPI(`/api/admin/testimonials/${id}/approve`, 'PUT', { is_approved });
+            loadTestimonials();
+        }
+
+        // Helper to read file as Data URL
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve('');
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(e);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Forms
+        document.getElementById('add-room-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('r_image_file').files[0];
+            const imageUrl = await readFileAsDataURL(file);
+            await fetchAPI('/api/admin/rooms', 'POST', {
+                name: document.getElementById('r_name').value, price: document.getElementById('r_price').value, image_url: imageUrl
+            });
+            loadRooms(); e.target.reset();
+        });
+        document.getElementById('add-blog-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('b_image_file').files[0];
+            const imageUrl = await readFileAsDataURL(file);
+            await fetchAPI('/api/admin/blog', 'POST', {
+                title: document.getElementById('b_title').value, content: document.getElementById('b_content').value, image_url: imageUrl
+            });
+            loadBlog(); e.target.reset();
+        });
+        document.getElementById('add-event-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('e_image_file').files[0];
+            const imageUrl = await readFileAsDataURL(file);
+            await fetchAPI('/api/admin/events', 'POST', {
+                title: document.getElementById('e_title').value, type: document.getElementById('e_type').value, image_url: imageUrl
+            });
+            loadEvents(); e.target.reset();
+        });
+        function editGallery(id, category, description) {
+            document.getElementById('g_id').value = id;
+            document.getElementById('g_category').value = category;
+            document.getElementById('g_description').value = description;
+            document.getElementById('g_submit_btn').innerText = 'Update Media';
+            document.getElementById('g_cancel_btn').classList.remove('hidden');
+            window.scrollTo(0, document.getElementById('gallery-tab').offsetTop);
+        }
+
+        function cancelGalleryEdit() {
+            document.getElementById('add-gallery-form').reset();
+            document.getElementById('g_id').value = '';
+            document.getElementById('g_submit_btn').innerText = 'Add Media';
+            document.getElementById('g_cancel_btn').classList.add('hidden');
+        }
+
+        document.getElementById('add-gallery-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('g_id').value;
+            const file = document.getElementById('g_image_file').files[0];
+            const imageUrl = await readFileAsDataURL(file);
+            
+            const payload = {
+                category: document.getElementById('g_category').value,
+                description: document.getElementById('g_description').value
+            };
+            if (imageUrl) payload.image_url = imageUrl;
+
+            if (id) {
+                await fetchAPI('/api/admin/gallery/' + id, 'PUT', payload);
+            } else {
+                if (!imageUrl) return alert("Please select an image/video to upload.");
+                await fetchAPI('/api/admin/gallery', 'POST', payload);
+            }
+            
+            loadGallery(); cancelGalleryEdit();
+        });
+        document.getElementById('edit-content-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const keys = [
+                { key: 'logo_text', val: document.getElementById('c_logo_text').value },
+                { key: 'hero_title', val: document.getElementById('c_hero_title').value },
+                { key: 'hero_subtitle', val: document.getElementById('c_hero_subtitle').value },
+                { key: 'about_text', val: document.getElementById('c_about_text').value },
+                { key: 'phone', val: document.getElementById('c_phone').value },
+                { key: 'email', val: document.getElementById('c_email').value }
+            ];
+            
+            const logoFile = document.getElementById('c_logo_image').files[0];
+            if (logoFile) {
+                const logoUrl = await readFileAsDataURL(logoFile);
+                keys.push({ key: 'logo_image', val: logoUrl });
+            }
+
+            for (const item of keys) {
+                await fetchAPI('/api/admin/content', 'PUT', { section_key: item.key, content_value: item.val });
+            }
+            document.getElementById('content-msg').innerText = 'Content saved successfully!';
+            setTimeout(() => document.getElementById('content-msg').innerText = '', 3000);
+        });
+
+    </script>
+</body>
+</html>
+

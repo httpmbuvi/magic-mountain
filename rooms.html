@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accommodation - Magic Mountain Resort Ke</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header id="main-header" class="scrolled">
+        <div class="logo">
+            <i class="fa-solid fa-mountain-sun"></i> Magic Mountain
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rooms.html" style="color: var(--accent-gold);">Accommodation</a></li>
+                <li><a href="dining.html">Dining</a></li>
+                <li><a href="events.html">Events</a></li>
+            </ul>
+        </nav>
+        <a href="booking.html" class="btn-primary">Book Your Stay</a>
+    </header>
+
+    <section style="padding-top: 8rem;">
+        <h1 class="section-title">Luxurious Accommodations</h1>
+        <p style="text-align: center; max-width: 600px; margin: 0 auto 3rem;">Wake up to breathtaking views of the mountain. Experience unparalleled comfort and elegance.</p>
+
+        <div id="rooms-container" class="mobile-swipe" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: auto;">
+            <!-- Rooms will be loaded here dynamically from API -->
+            <p style="text-align:center; width:100%;">Loading rooms...</p>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script>
+        localforage.getItem('mockDB').then(db => {
+            if (db && db.content) {
+                const text = db.content['logo_text'] || 'Magic Mountain';
+                const img = db.content['logo_image'];
+                if (db.content['logo_text'] || db.content['logo_image']) {
+                    const html = img ? `<img src="${img}" style="height: 40px; margin-right: 10px; vertical-align: middle;"> ${text}` 
+                                     : `<i class="fa-solid fa-mountain-sun"></i> ${text}`;
+                    document.querySelectorAll('.logo').forEach(el => el.innerHTML = html);
+                }
+            }
+        });
+        async function loadPublicRooms() {
+            try {
+                const res = await fetch('/api/rooms');
+                const rooms = await res.json();
+                renderRooms(rooms);
+            } catch (err) {
+                const db = await localforage.getItem('mockDB');
+                if(db && db.rooms) renderRooms(db.rooms);
+                else renderRooms([]);
+            }
+        }
+        function renderRooms(rooms) {
+            const container = document.getElementById('rooms-container');
+            if (rooms.length === 0) {
+                container.innerHTML = '<p style="text-align:center; width:100%;">No rooms available currently.</p>';
+                return;
+            }
+            container.innerHTML = rooms.map(r => {
+                const url = r.image_url || 'https://images.unsplash.com/photo-1590490360182-c33d57733427';
+                const isVideo = url.startsWith('data:video') || url.endsWith('.mp4');
+                const mediaTag = isVideo 
+                    ? `<video src="${url}" style="width: 100%; height: 250px; object-fit: cover;" autoplay loop muted playsinline></video>`
+                    : `<img src="${url}" style="width: 100%; height: 250px; object-fit: cover;" alt="${r.name}">`;
+                return `
+                <div class="glass" style="border-radius: 10px; overflow: hidden; transition: transform 0.3s ease;">
+                    ${mediaTag}
+                    <div style="padding: 1.5rem;">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary-green);">${r.name}</h3>
+                        <p style="color: var(--accent-gold); font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem;">$${r.price} / night</p>
+                        <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">${r.description || 'Enjoy a luxury stay with beautiful views.'}</p>
+                        <a href="booking.html?room=${r.id}" class="btn-secondary" style="width: 100%; text-align: center;">Book Now</a>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        loadPublicRooms();
+    </script>
+    <footer>
+        <div class="logo"><i class="fa-solid fa-mountain-sun"></i> Magic Mountain</div>
+        <p>&copy; 2026 Magic Mountain Resort Ke. All rights reserved.</p>
+        <a href="admin.html" class="admin-link">Admin Portal</a>
+    </footer>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html"><i class="fa-solid fa-home"></i> Home</a>
+        <a href="rooms.html" class="active"><i class="fa-solid fa-bed"></i> Rooms</a>
+        <a href="booking.html"><i class="fa-solid fa-calendar-check"></i> Book</a>
+        <a href="gallery.html"><i class="fa-solid fa-images"></i> Gallery</a>
+        <a href="contact.html"><i class="fa-solid fa-phone"></i> Contact</a>
+    </nav>
+</body>
+</html>
+
